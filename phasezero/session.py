@@ -8,7 +8,7 @@ from urllib.parse import urljoin
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-DEFAULT_HOST = 'https://localhost:5001'
+DEFAULT_HOST = 'https://api.phasezerotrials.com'
 LOGIN_ENDPOINT = DEFAULT_HOST + '/1.0/Auth/login'
 
 

@@ -1,5 +1,4 @@
 import urllib
-from urllib.error import HTTPError
 from pathlib import Path
 import mimetypes
 import threading
@@ -9,7 +8,6 @@ import math
 
 import phasezero.core as core
 
-from boto3.s3.transfer import TransferConfig
 from tqdm import tqdm
 
 from requests.packages.urllib3.exceptions import InsecureRequestWarning

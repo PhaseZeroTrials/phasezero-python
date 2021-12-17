@@ -34,7 +34,9 @@ def main():
         return
 
     args.session = session.connect(args.user, args.password)
-    args.func(args)
+
+    if 'func' in args:
+        args.func(args)
 
     if len(vars(args)) == 3 and args.user and args.password and args.session:
         prompt_user(args)
