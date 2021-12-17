@@ -2,7 +2,7 @@
 
 Phase Zero is a no-code platform designed for any healthcare organization to safely collect, store, and share any type of health related data.
 
-This Python CLI wraps the Ovation REST API for document management including:
+This Python CLI wraps the Phase Zero REST API for document management including:
 
 1. File Upload
    
