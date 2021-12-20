@@ -56,7 +56,7 @@ python3 -m phasezero.cli -u user@email.com -p yourPhaseZeroPassword upload 1 doc
 
 ## Recommendations
 
-If you do not want to run the command in the root of your folder, it is recommended to set add the phaszero module to your  `PYTHONPATH`
+Add the phaszero module to your  `PYTHONPATH`. This allows the python module to be invoked from anywhere in ther terminal.
 
 [Stack Overflow Example](https://stackoverflow.com/a/53311583)
 
@@ -64,7 +64,6 @@ If you do not want to run the command in the root of your folder, it is recommen
 export PYTHONPATH="${PYTHONPATH}:/path/to/my/modules/"
 ```
 
-This allows the command `python3 -m phasezero.cli` to be run from anywhere
 
 ### Setting an Alias
 
