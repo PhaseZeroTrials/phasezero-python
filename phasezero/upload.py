@@ -98,7 +98,7 @@ def upload_revision(session, parent_file, local_path, progress=tqdm):
     Upload a new `Revision` to `parent_file`. File is uploaded from `local_path` to
     the Phase Zero cloud, and the newly created `Revision` version is set.
     :param chunk_size:
-    :param session: ovation.connection.Session
+    :param session: phasezero.connection.Session
     :param parent_file: file entity dictionary or file ID string
     :param local_path: local path
     :param progress: if not None, wrap in a progress (i.e. tqdm). Default: tqdm

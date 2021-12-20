@@ -11,10 +11,10 @@ def main():
     parser.add_argument('-p', '--password', help='Phase Zero password')
 
     subparsers = parser.add_subparsers(title='Available subcommands',
-                                       description='Use `python -m ovation.cli <subcommand> -h` for additional help')
+                                       description='Use `python -m phasezero.cli <subcommand> -h` for additional help')
 
     # UPLOAD
-    parser_upload = subparsers.add_parser('upload', description='Upload files to Ovation')
+    parser_upload = subparsers.add_parser('upload', description='Upload files to Phase Zero')
     parser_upload.add_argument('project_id', help='Project or Folder UUID')
     parser_upload.add_argument('project_path', help='Path to destination folder in Phase Zero')
     parser_upload.add_argument('paths', nargs='+', help='Paths to local files or directories')

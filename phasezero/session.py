@@ -31,7 +31,7 @@ def connect(email, password):
 
     Returns
     -------
-    session : ovation.session.Session
+    session : phasezero.session.Session
         A new authenticated Session
 
     """
@@ -94,7 +94,7 @@ class Session(object):
     """
     Represents an authenticated session.
 
-    `Session` wraps a `requests.Session` and provides methods for convenient creation of Ovation API paths and URLs.
+    `Session` wraps a `requests.Session` and provides methods for convenient creation of Phase Zero API paths and URLs.
     All responses are transformed via `simplify_response` to make interactive use more convenient.
     """
 
