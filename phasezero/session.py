@@ -2,13 +2,14 @@ import collections
 import six
 import requests
 import retrying
+import jwt
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from urllib.parse import urljoin
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-DEFAULT_HOST = 'https://api.phasezerotrials.com'
+DEFAULT_HOST = 'https://api-dev.phasezerotrials.com'
 LOGIN_ENDPOINT = DEFAULT_HOST + '/1.0/Auth/login'
 
 
@@ -125,6 +126,9 @@ class Session(object):
         self.session.auth = BearerAuth(token)
         self.session.headers = {'content-type': 'application/json',
                                 'accept': 'application/json'}
+
+    def get_tenant_id(self):
+        return jwt.decode(self.token, options={"verify_signature": False})['tenantId']
 
     def make_url(self, path):
         """

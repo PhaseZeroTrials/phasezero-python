@@ -6,7 +6,6 @@ import phasezero.contents as contents
 import phasezero.prompts as prompts
 
 
-
 def main():
     parser = argparse.ArgumentParser(prog='python3 -m phasezero.cli')
     parser.add_argument('-u', '--user', help='Phase Zero user email')
@@ -22,8 +21,6 @@ def main():
     parser_upload.add_argument('paths', nargs='+', help='Paths to local files or directories')
     parser_upload.set_defaults(func=upload.upload_paths)
 
-    args = parser.parse_args()
-
     # LIST
     parser_ls = subparsers.add_parser('list',
                                       aliases=['ls'],
@@ -33,6 +30,8 @@ def main():
     parser_ls.add_argument('path', nargs='?', help='(Optional) S3 Relative Path', default='')
 
     parser_ls.set_defaults(func=contents.list_contents_main)
+
+    args = parser.parse_args()
 
     if args.user is None:
         args.user = input('Email: ')
