@@ -149,6 +149,10 @@ class Session(object):
                                  wait_jitter_max=MIN_RETRY_DELAY_MS,
                                  retry_on_exception=_retry_if_http_error).call(m, *args, **kwargs)
 
+    def get_stream(self, path, **kwargs):
+        r = self.retry_call(self._get, path, stream=True, **kwargs)
+        return r
+
     def get(self, path, **kwargs):
         r = self.retry_call(self._get, path, **kwargs)
 

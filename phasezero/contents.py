@@ -2,8 +2,9 @@ import texttable
 import phasezero.core as core
 
 
-def _format_s3_objects(rootPrefix, prefix, folder_name):
-    return { 'name': folder_name.replace(prefix, ''), 'path': folder_name.replace(rootPrefix, '') }
+def format_s3_objects(root_prefix, prefix, folder_name):
+    return {'name': folder_name.replace(prefix, ''), 'path': folder_name.replace(root_prefix, '')}
+
 
 def list_contents_main(args):
     session = args.session
@@ -27,11 +28,11 @@ def list_contents_main(args):
         table.add_rows([['Name', 'Path']])
 
         tenant_id = session.get_tenant_id()
-        root_prefix = f"{tenant_id}/{project_id}/"
+        root_prefix = f"{tenant_id}/{project_id}/".replace("//", "/")
 
         # Add Folders
-        folders = [_format_s3_objects(root_prefix, result.prefix, folder) for folder in result.commonPrefixes]
-        s3_objects = [_format_s3_objects(root_prefix, result.prefix, obj.key) for obj in result.s3Objects]
+        folders = [format_s3_objects(root_prefix, result.prefix, folder) for folder in result.commonPrefixes]
+        s3_objects = [format_s3_objects(root_prefix, result.prefix, obj.key) for obj in result.s3Objects]
         for folder in folders:
             table.add_row([folder['name'], folder['path']])
 

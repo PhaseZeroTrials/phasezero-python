@@ -42,9 +42,11 @@ def get_file(session, project_id, project_path, name):
     result = session.get(url_endpoint)
     return simplify_response(result)
 
+
 def get_projects(session):
     url_endpoint = "/Studies"
     return simplify_response(session.get(url_endpoint))
+
 
 def list_files(session, project_id, path=''):
     url_endpoint = f"/Documents/Study/{project_id}"
@@ -54,6 +56,15 @@ def list_files(session, project_id, path=''):
 
     result = session.get(url_endpoint)
     return simplify_response(result)
+
+
+def download_file(session, project_id, key):
+    relative_path = urllib.parse.quote(key, safe='')
+    url_endpoint = f"/Documents/Study/{project_id}/Path/{relative_path}/Download"
+
+    result = session.get_stream(url_endpoint)
+    return result
+
 
 def initiate_multipart_upload(session, document_id):
     """

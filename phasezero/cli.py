@@ -2,6 +2,7 @@ import argparse
 from getpass import getpass
 import phasezero.session as session
 import phasezero.upload as upload
+import phasezero.download as download
 import phasezero.contents as contents
 import phasezero.prompts as prompts
 
@@ -20,6 +21,13 @@ def main():
     parser_upload.add_argument('project_path', help='Path to destination folder in Phase Zero')
     parser_upload.add_argument('paths', nargs='+', help='Paths to local files or directories')
     parser_upload.set_defaults(func=upload.upload_paths)
+
+    # DOWNLOAD
+    parser_download = subparsers.add_parser('download', description='Download files from Phase Zero')
+    parser_download.add_argument('project_id', help='Project Id', default='')
+    parser_download.add_argument('path', nargs='?', help='(Optional) S3 Relative Path to download', default='')
+    parser_download.add_argument('-o', '--output', help='Output directory')
+    parser_download.set_defaults(func=download.download_main)
 
     # LIST
     parser_ls = subparsers.add_parser('list',
@@ -60,6 +68,10 @@ def prompt_user(args):
         print("\n==========Upload Selected==========\n")
         prompts.handle_upload_prompt(args)
         upload.upload_paths(args)
+    elif value == 2:
+        print("\n==========Download Selected==========\n")
+        prompts.handle_download_prompt(args)
+        download.download_main(args)
     elif value == 3:
         print("\n==========List Selected==========\n")
         prompts.handle_list_prompt(args)
