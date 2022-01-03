@@ -2,7 +2,9 @@ import argparse
 from getpass import getpass
 import phasezero.session as session
 import phasezero.upload as upload
+import phasezero.contents as contents
 import phasezero.prompts as prompts
+
 
 
 def main():
@@ -22,6 +24,15 @@ def main():
 
     args = parser.parse_args()
 
+    # LIST
+    parser_ls = subparsers.add_parser('list',
+                                      aliases=['ls'],
+                                      description='List Projects or Contents')
+
+    parser_ls.add_argument('project_id', nargs='?', help='(Optional) Project or Folder ID', default='')
+    parser_ls.add_argument('path', nargs='?', help='(Optional) S3 Relative Path', default='')
+
+    parser_ls.set_defaults(func=contents.list_contents_main)
 
     if args.user is None:
         args.user = input('Email: ')
@@ -44,12 +55,16 @@ def main():
 
 def prompt_user(args):
     print("No subcommands were provided. Either provide a subcommand or continue")
-    print("Available subcommands\n1:Upload\n2:Download")
+    print("Available subcommands\n1:Upload\n2:Download\n3:List Project or Files")
     value = int(input("Please enter a subcommand (e.g. enter 1 for Upload):"))
     if value == 1:
         print("\n==========Upload Selected==========\n")
         prompts.handle_upload_prompt(args)
         upload.upload_paths(args)
+    elif value == 3:
+        print("\n==========List Selected==========\n")
+        prompts.handle_list_prompt(args)
+        contents.list_contents_main(args)
     else:
         print("Unknown command")
         return

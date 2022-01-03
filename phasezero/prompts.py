@@ -8,3 +8,14 @@ def handle_upload_prompt(args):
           "Example for a directory /path/to/Files\n"
           "Example for a single file /path/to/Files/file.txt\n")
     args.paths = input("Local File/Directory Path: ")
+
+
+def handle_list_prompt(args):
+    print("[Optional] Enter a Project Id To list, leave blank to see all available projects\n")
+    args.project_id = input("Project Id: ")
+    if args.project_id:
+        print("[Optional] Enter the relative path to list files in S3 directory\n"
+              "Example for a directory /path/to/Files\n")
+        args.path = input("S3 RelativePath: ")
+    else:
+        args.path = ''

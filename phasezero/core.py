@@ -29,7 +29,7 @@ def _create_contents(session, project_id, project_path, name):
 
 def get_file(session, project_id, project_path, name):
     """
-    Gets all Projects visible to the authenticated user
+    Gets specific file specified by the project_id and the project_path
     :param name:
     :param project_path:
     :param project_id:
@@ -42,6 +42,9 @@ def get_file(session, project_id, project_path, name):
     result = session.get(url_endpoint)
     return simplify_response(result)
 
+def get_projects(session):
+    url_endpoint = "/Studies"
+    return simplify_response(session.get(url_endpoint))
 
 def initiate_multipart_upload(session, document_id):
     """
