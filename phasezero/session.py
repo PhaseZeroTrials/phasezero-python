@@ -2,6 +2,7 @@ import collections
 import six
 import requests
 import retrying
+import jwt
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from urllib.parse import urljoin
@@ -126,6 +127,9 @@ class Session(object):
         self.session.headers = {'content-type': 'application/json',
                                 'accept': 'application/json'}
 
+    def get_tenant_id(self):
+        return jwt.decode(self.token, options={"verify_signature": False})['tenantId']
+
     def make_url(self, path):
         """
         Creates a full URL by combining the API host, prefix and the provided path
@@ -144,6 +148,10 @@ class Session(object):
                                  wait_exponential_max=MAX_RETRY_DELAY_MS,
                                  wait_jitter_max=MIN_RETRY_DELAY_MS,
                                  retry_on_exception=_retry_if_http_error).call(m, *args, **kwargs)
+
+    def get_stream(self, path, **kwargs):
+        r = self.retry_call(self._get, path, stream=True, **kwargs)
+        return r
 
     def get(self, path, **kwargs):
         r = self.retry_call(self._get, path, **kwargs)
