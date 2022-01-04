@@ -5,9 +5,6 @@ Phase Zero is a no-code platform designed for any healthcare organization to saf
 This Python CLI wraps the Phase Zero REST API for document management including:
 
 1. File Upload
-   
-[In Progress]
-
 2. File Download
 3. List Files
 
@@ -52,6 +49,20 @@ Example usage from the terminal
 
 ```
 python3 -m phasezero.cli -u user@email.com -p yourPhaseZeroPassword upload 1 documents/ ./path/to/files/
+```
+
+### Downloading files from the terminal
+
+Use the `phasezero.cli` modules' `download` command to download files from Phase Zero into your local file system
+The `download` command takes the following positional arguments:
+
+```
+positional arguments:
+  project_id    Project Id
+  path          Path to desired directory for file to download
+  
+named arguments:  
+  -o            Output local file directory
 ```
 
 ## Recommendations
