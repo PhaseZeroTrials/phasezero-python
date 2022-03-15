@@ -36,7 +36,7 @@ class ProgressPercentage(object):
                 self._progress.close()
 
 
-def upload_folder(session, project_id, project_path, directory_path, progress=tqdm):
+def upload_folder(session, project_id, project_path, directory_path, failed_files, progress=tqdm):
     """
     Recursively uploads a folder to Phase Zero
 
@@ -44,6 +44,7 @@ def upload_folder(session, project_id, project_path, directory_path, progress=tq
     :param project_id:
     :param session: Session
     :param directory_path: local path to directory
+    :param failed_files: list of files failed to be uploaded
     :param progress: if not None, wrap in a progress (i.e. tqdm). Default: tqdm
     """
 
@@ -61,7 +62,12 @@ def upload_folder(session, project_id, project_path, directory_path, progress=tq
                 document = core.get_file(session, project_id, project_path, f)
                 file = core.initiate_multipart_upload(session, document['id'])
 
-            upload_revision(session, file, path, progress=progress)
+            try:
+                upload_revision(session, file, path, progress=progress)
+            except:
+                failed_files << relative_path
+
+
 
 
 def upload_file(session, project_id, project_path, file_path, progress=tqdm):
@@ -150,6 +156,7 @@ def upload_paths(args):
     project_id = args.project_id
     project_path = args.project_path
     paths = args.paths
+    failed_files = []
     if type(args.paths) != list:
         paths = [args.paths]
 
@@ -159,6 +166,11 @@ def upload_paths(args):
     for p in paths:
         print('Uploading {}'.format(p))
         if os.path.isdir(p):
-            upload_folder(session, project_id, project_path, p)
+            upload_folder(session, project_id, project_path, p, failed_files)
         else:
             upload_file(session, project_id, project_path, p)
+
+    if len(failed_files) > 0:
+        print('Failed to upload the following files:')
+        for file in failed_files:
+            print(file)
