@@ -65,7 +65,9 @@ def upload_folder(session, project_id, project_path, directory_path, failed_file
             try:
                 upload_revision(session, file, path, progress=progress)
             except:
-                failed_files << file
+                failed_files << relative_path
+
+
 
 
 def upload_file(session, project_id, project_path, file_path, progress=tqdm):
@@ -164,7 +166,7 @@ def upload_paths(args):
     for p in paths:
         print('Uploading {}'.format(p))
         if os.path.isdir(p):
-            upload_folder(session, project_id, project_path, failed_files, p)
+            upload_folder(session, project_id, project_path, p, failed_files)
         else:
             upload_file(session, project_id, project_path, p)
 
