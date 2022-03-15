@@ -1,16 +1,15 @@
+import math
+import mimetypes
+import os
+import threading
 import urllib
 from pathlib import Path
-import mimetypes
-import threading
+
 import requests
-import os
-import math
-
-import phasezero.core as core
-
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from tqdm import tqdm
 
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+import phasezero.core as core
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -36,7 +35,7 @@ class ProgressPercentage(object):
                 self._progress.close()
 
 
-def upload_folder(session, project_id, project_path, directory_path, progress=tqdm):
+def upload_folder(session, project_id, project_path, directory_path, failed_files, progress=tqdm):
     """
     Recursively uploads a folder to Phase Zero
 
@@ -44,6 +43,7 @@ def upload_folder(session, project_id, project_path, directory_path, progress=tq
     :param project_id:
     :param session: Session
     :param directory_path: local path to directory
+    :param failed_files: list of files failed to be uploaded
     :param progress: if not None, wrap in a progress (i.e. tqdm). Default: tqdm
     """
 
@@ -56,15 +56,17 @@ def upload_folder(session, project_id, project_path, directory_path, progress=tq
         for f in files:
             path = os.path.join(root, f)
             try:
-                file = core.create_file(session, project_id, relative_path, f)
-            except:
-                document = core.get_file(session, project_id, project_path, f)
-                file = core.initiate_multipart_upload(session, document['id'])
+                try:
+                    file = core.create_file(session, project_id, relative_path, f)
+                except:
+                    document = core.get_file(session, project_id, project_path, f)
+                    file = core.initiate_multipart_upload(session, document['id'])
+                upload_revision(session, file, path, progress=progress)
+            except Exception as e:
+                failed_files.append({'path': path, 'error': e})
 
-            upload_revision(session, file, path, progress=progress)
 
-
-def upload_file(session, project_id, project_path, file_path, progress=tqdm):
+def upload_file(session, project_id, project_path, file_path, failed_files, progress=tqdm):
     """
     Upload a file to Phase Zero
 
@@ -77,12 +79,15 @@ def upload_file(session, project_id, project_path, file_path, progress=tqdm):
     """
     name = os.path.basename(file_path)
     try:
-        file = core.create_file(session, project_id, project_path, name)
-    except:
-        document = core.get_file(session, project_id, project_path, name)
-        file = core.initiate_multipart_upload(session, document['id'])
+        try:
+            file = core.create_file(session, project_id, project_path, name)
+        except:
+            document = core.get_file(session, project_id, project_path, name)
+            file = core.initiate_multipart_upload(session, document['id'])
 
-    return upload_revision(session, file, file_path, progress=progress)
+        return upload_revision(session, file, file_path, progress=progress)
+    except Exception as e:
+        failed_files.append({'path': file_path, 'error': e})
 
 
 def guess_content_type(file_name):
@@ -150,6 +155,7 @@ def upload_paths(args):
     project_id = args.project_id
     project_path = args.project_path
     paths = args.paths
+    failed_files = []
     if type(args.paths) != list:
         paths = [args.paths]
 
@@ -159,6 +165,11 @@ def upload_paths(args):
     for p in paths:
         print('Uploading {}'.format(p))
         if os.path.isdir(p):
-            upload_folder(session, project_id, project_path, p)
+            upload_folder(session, project_id, project_path, p, failed_files)
         else:
-            upload_file(session, project_id, project_path, p)
+            upload_file(session, project_id, project_path, p, failed_files)
+
+    if len(failed_files) > 0:
+        print('Failed to upload the following files:')
+        for file in failed_files:
+            print(file)
