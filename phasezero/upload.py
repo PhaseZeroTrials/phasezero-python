@@ -1,15 +1,16 @@
-import math
-import mimetypes
-import os
-import threading
 import urllib
 from pathlib import Path
-
+import mimetypes
+import threading
 import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from tqdm import tqdm
+import os
+import math
 
 import phasezero.core as core
+
+from tqdm import tqdm
+
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -56,17 +57,20 @@ def upload_folder(session, project_id, project_path, directory_path, failed_file
         for f in files:
             path = os.path.join(root, f)
             try:
-                try:
-                    file = core.create_file(session, project_id, relative_path, f)
-                except:
-                    document = core.get_file(session, project_id, project_path, f)
-                    file = core.initiate_multipart_upload(session, document['id'])
+                file = core.create_file(session, project_id, relative_path, f)
+            except:
+                document = core.get_file(session, project_id, project_path, f)
+                file = core.initiate_multipart_upload(session, document['id'])
+
+            try:
                 upload_revision(session, file, path, progress=progress)
-            except Exception as e:
-                failed_files.append({'path': path, 'error': e})
+            except:
+                failed_files << relative_path
 
 
-def upload_file(session, project_id, project_path, file_path, failed_files, progress=tqdm):
+
+
+def upload_file(session, project_id, project_path, file_path, progress=tqdm):
     """
     Upload a file to Phase Zero
 
@@ -79,15 +83,12 @@ def upload_file(session, project_id, project_path, file_path, failed_files, prog
     """
     name = os.path.basename(file_path)
     try:
-        try:
-            file = core.create_file(session, project_id, project_path, name)
-        except:
-            document = core.get_file(session, project_id, project_path, name)
-            file = core.initiate_multipart_upload(session, document['id'])
+        file = core.create_file(session, project_id, project_path, name)
+    except:
+        document = core.get_file(session, project_id, project_path, name)
+        file = core.initiate_multipart_upload(session, document['id'])
 
-        return upload_revision(session, file, file_path, progress=progress)
-    except Exception as e:
-        failed_files.append({'path': file_path, 'error': e})
+    return upload_revision(session, file, file_path, progress=progress)
 
 
 def guess_content_type(file_name):
@@ -167,7 +168,7 @@ def upload_paths(args):
         if os.path.isdir(p):
             upload_folder(session, project_id, project_path, p, failed_files)
         else:
-            upload_file(session, project_id, project_path, p, failed_files)
+            upload_file(session, project_id, project_path, p)
 
     if len(failed_files) > 0:
         print('Failed to upload the following files:')
