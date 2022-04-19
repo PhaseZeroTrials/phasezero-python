@@ -114,12 +114,14 @@ def download_main(args):
     prefix = result['prefix']
 
     tenant_id = session.get_tenant_id()
-    file_path = f"{tenant_id}/{project_id}/{path}".replace("//", "/")
+    file_path = f"{tenant_id}/{project_id}/{path}/".replace("//", "/")
 
     tenant_id = session.get_tenant_id()
     root_prefix = f"{tenant_id}/{project_id}/".replace("//", "/")
 
     if file_path in folders:
+        download_folder(session, folders, files, project_id, root_prefix, prefix, output=output)
+    elif file_path == prefix and len(folders) == 0:
         download_folder(session, folders, files, project_id, root_prefix, prefix, output=output)
     elif file_path in files:
         download_file(session, project_id, path, output=output)
