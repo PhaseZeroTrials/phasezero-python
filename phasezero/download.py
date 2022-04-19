@@ -47,7 +47,10 @@ def _traverse_folder(session, folder, project_id, root_prefix, prefix, files, ou
     if output is None:
         path = folder_name
     else:
-        path = os.path.join(output, folder_name)
+        if folder_name == '/':
+            path = output
+        else:
+            path = os.path.join(output, folder_name)
 
     if not os.path.isdir(path):
         os.mkdir(path)
@@ -63,7 +66,10 @@ def _traverse_folder(session, folder, project_id, root_prefix, prefix, files, ou
         s3_key = file.replace(root_prefix, '')
         files += [{'s3_key': s3_key, 'output_path': path}]
     for f in folders:
-        _traverse_folder(session, f, project_id, root_prefix, prefix, files, output=path, progress=progress)
+        next_key = f.replace(str(root_prefix), "")
+        # Do not try to traverse root directory more than once (infinite recursive loop)
+        if next_key != '/':
+            _traverse_folder(session, f, project_id, root_prefix, prefix, files, output=path, progress=progress)
 
 
 def _download_file_implicit_path(session, project_id, file_dict, progress=tqdm):
