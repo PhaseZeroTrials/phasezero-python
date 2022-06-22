@@ -53,7 +53,7 @@ def connect(email, password):
 
     token = r.json()['token']
     print(f"Successfully Logged in as {email}")
-    return Session(token)
+    return Session(token, email, password)
 
 
 def simplify_response(data, hoist_singleton=True):
@@ -99,7 +99,7 @@ class Session(object):
     All responses are transformed via `simplify_response` to make interactive use more convenient.
     """
 
-    def __init__(self, token, api=DEFAULT_HOST, prefix='/1.0', retry=3):
+    def __init__(self, token, email, password, api=DEFAULT_HOST, prefix='/1.0', retry=3):
         """
         Creates a new Session
         :param token: Phase Zero API token
@@ -110,6 +110,8 @@ class Session(object):
         self.session = requests.Session()
 
         self.token = token
+        self.email = email
+        self.password = password
         self.api_base = api
         self.prefix = prefix
         self.retry = retry if retry is not None else 0
@@ -206,3 +208,25 @@ class Session(object):
         r = self.session.delete(self.make_url(path), verify=False, **kwargs)
         r.raise_for_status()
         return r
+
+    def refresh_token(self):
+        data = {'email': self.email, 'password': self.password}
+        r = requests.post(LOGIN_ENDPOINT, json=data, verify=False)
+        if r.status_code != requests.codes.ok:
+            messages = {401: "Email or password incorrect. Please check your account credentials and try again. "
+                         "Please email hello@phasezero.co if you need assistance.",
+                        500: "Unable to connect due to a server error. Our engineering team has been notified. "
+                         "Please email hello@phasezero.co if you need assistance."}
+            if r.status_code in messages.keys():
+                print(messages[r.status_code])
+                return
+            else:
+                r.raise_for_status()
+
+        token = r.json()['token']
+
+        # Assign token
+        self.token = token
+
+        return self.token
+
