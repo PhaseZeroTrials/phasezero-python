@@ -1,6 +1,3 @@
-import requests
-import six
-import base64
 from phasezero.session import simplify_response
 import urllib
 
@@ -66,6 +63,7 @@ def download_file(session, project_id, key):
 
     result = session.get_stream(url_endpoint)
     return result
+
 
 def initiate_multipart_upload(session, document_id):
     """
