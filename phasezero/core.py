@@ -1,4 +1,3 @@
-import six
 from phasezero.session import simplify_response
 import urllib
 
