@@ -1,4 +1,6 @@
+import requests
 import six
+import base64
 from phasezero.session import simplify_response
 import urllib
 
@@ -64,6 +66,26 @@ def download_file(session, project_id, key):
 
     result = session.get_stream(url_endpoint)
     return result
+
+def get_images_base64():
+    """
+    Gets image from a document as a base64 encoded string
+    :param document_id:
+    :param session: phasezero.session.Session
+    :return: list of Projects
+    """
+    jwtToken = ""
+    url = "https://api.phasezerotrials.com/1.0/Documents/1d899d37-e253-4923-bf8c-65989bd6b6df/Url"
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + jwtToken
+    }
+
+    presigned_url = requests.get(url, headers=headers).json()
+    response = requests.get(presigned_url)
+    print(response.content)
+
 
 
 def initiate_multipart_upload(session, document_id):

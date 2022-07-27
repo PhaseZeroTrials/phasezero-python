@@ -9,7 +9,7 @@ from urllib.parse import urljoin
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-DEFAULT_HOST = 'https://api.phasezerotrials.com'
+DEFAULT_HOST = 'https://localhost:5001'
 LOGIN_ENDPOINT = DEFAULT_HOST + '/1.0/Auth/login'
 
 
@@ -52,8 +52,9 @@ def connect(email, password):
             r.raise_for_status()
 
     token = r.json()['token']
+    default_tenant_id = r.json()['defaultTenantId'];
     print(f"Successfully Logged in as {email}")
-    return Session(token, email, password)
+    return Session(token, default_tenant_id, email, password)
 
 
 def simplify_response(data, hoist_singleton=True):
@@ -99,7 +100,7 @@ class Session(object):
     All responses are transformed via `simplify_response` to make interactive use more convenient.
     """
 
-    def __init__(self, token, email, password, api=DEFAULT_HOST, prefix='/1.0', retry=3):
+    def __init__(self, token, default_tenant_id, email, password, api=DEFAULT_HOST, prefix='/1.0', retry=3):
         """
         Creates a new Session
         :param token: Phase Zero API token
@@ -110,6 +111,7 @@ class Session(object):
         self.session = requests.Session()
 
         self.token = token
+        self.default_tenant_id = default_tenant_id
         self.email = email
         self.password = password
         self.api_base = api
@@ -119,6 +121,7 @@ class Session(object):
         class BearerAuth(object):
             def __init__(self, token):
                 self.token = token
+                self.default_tenant_id = default_tenant_id
 
             def __call__(self, r):
                 # modify and return the request
@@ -127,10 +130,12 @@ class Session(object):
 
         self.session.auth = BearerAuth(token)
         self.session.headers = {'content-type': 'application/json',
-                                'accept': 'application/json'}
+                                'accept': 'application/json',
+                                'X-Tenant-Id': self.default_tenant_id
+                                }
 
     def get_tenant_id(self):
-        return jwt.decode(self.token, options={"verify_signature": False})['tenantId']
+        return self.default_tenant_id;
 
     def make_url(self, path):
         """
