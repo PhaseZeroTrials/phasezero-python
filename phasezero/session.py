@@ -2,7 +2,6 @@ import collections
 import six
 import requests
 import retrying
-import jwt
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from urllib.parse import urljoin
