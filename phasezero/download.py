@@ -114,16 +114,19 @@ def download_main(args):
     prefix = result['prefix']
 
     tenant_id = session.get_tenant_id()
-    file_path = f"{tenant_id}/{project_id}/{path}/".replace("//", "/")
+    file_path = f"{tenant_id}/{project_id}/{path}".replace("//", "/")
+
+    # Occasionally, the prefix returned by the API is not the same as the prefix used to list the files
+    file_path_directory = f"{file_path}/"
 
     tenant_id = session.get_tenant_id()
     root_prefix = f"{tenant_id}/{project_id}/".replace("//", "/")
 
-    if file_path in folders:
+    if file_path in folders or file_path_directory in folders:
         download_folder(session, folders, files, project_id, root_prefix, prefix, output=output)
     elif file_path == prefix and len(folders) == 0:
         download_folder(session, folders, files, project_id, root_prefix, prefix, output=output)
-    elif file_path in files:
+    elif file_path in files or file_path_directory in files:
         download_file(session, project_id, path, output=output)
     elif path is None or path == '':
         print("Downloading entire project")
