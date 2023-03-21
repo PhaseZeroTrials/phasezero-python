@@ -130,7 +130,8 @@ class Session(object):
         self.session.auth = BearerAuth(token)
         self.session.headers = {'content-type': 'application/json',
                                 'accept': 'application/json',
-                                'X-Tenant-Id': self.default_tenant_id
+                                'X-Tenant-Id': self.default_tenant_id,
+                                'X-Requested-With': 'b5f8864d-51f4-41cd-bef9-b6b7fe46b41b'
                                 }
 
     def get_tenant_id(self):
