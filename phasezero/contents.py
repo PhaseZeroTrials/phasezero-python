@@ -17,7 +17,8 @@ def list_contents_main(args):
         table.set_cols_align(["l", "l"])
         table.add_rows([['Name', 'ID']])
         for p in core.get_projects(session):
-            table.add_row([p.name, p.id])
+            print(p);
+            table.add_row([p['name'], p['id']])
 
         print(table.draw())
     else:
@@ -31,8 +32,8 @@ def list_contents_main(args):
         root_prefix = f"{tenant_id}/{project_id}/".replace("//", "/")
 
         # Add Folders
-        folders = [format_s3_objects(root_prefix, result.prefix, folder) for folder in result.commonPrefixes]
-        s3_objects = [format_s3_objects(root_prefix, result.prefix, obj.key) for obj in result.s3Objects]
+        folders = [format_s3_objects(root_prefix, result['prefix'], folder) for folder in result['commonPrefixes']]
+        s3_objects = [format_s3_objects(root_prefix, result['prefix'], obj.key) for obj in result['s3Objects']]
         for folder in folders:
             table.add_row([folder['name'], folder['path']])
 
