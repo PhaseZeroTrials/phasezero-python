@@ -97,9 +97,14 @@ def download_file(session, project_id, path, output=None, progress=tqdm):
 
 def get_files_and_folders(session, project_id, path):
     results = core.list_files(session, project_id, path)
-    folders = results.commonPrefixes
-    files = [obj.key for obj in results.s3Objects]
-    return {"files": files, "folders": folders, "prefix": results.prefix}
+    # Check if commonPrefixes is in dict (if not, it is empty)
+    if 'commonPrefixes' in results:
+        folders = results['commonPrefixes']
+    else:
+        folders = results['commonPrefixes'] = []
+
+    files = [obj['key'] for obj in results['s3Objects']]
+    return {"files": files, "folders": folders, "prefix": results['prefix']}
 
 
 def download_main(args):
