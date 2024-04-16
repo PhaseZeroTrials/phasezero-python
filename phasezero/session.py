@@ -232,7 +232,7 @@ class Session(object):
 
         # Assign token
         self.token = token
-        self.session.auth = token
+        self.session.auth.token = token
 
         return self.token
 
