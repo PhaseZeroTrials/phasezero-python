@@ -77,7 +77,8 @@ def _download_file_implicit_path(session, project_id, file_dict, progress=tqdm):
 
 
 def download_file(session, project_id, path, output=None, progress=tqdm):
-    response = core.download_file(session, project_id, path)
+    url = core.get_presigned_url(session, project_id, path)
+    response = core.download_file_from_url(url)
     name = os.path.basename(path)
     if output:
         dest = os.path.join(output, name)
