@@ -1,5 +1,9 @@
 from phasezero.session import simplify_response
 import urllib
+import requests
+
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 CREATE_FILE_ENDPOINT = '/1.0/Documents/Study/{studyId}/Path/{relativePath}'
 
@@ -56,12 +60,16 @@ def list_files(session, project_id, path=''):
     result = session.get(url_endpoint)
     return simplify_response(result)
 
-
-def download_file(session, project_id, key):
+def get_presigned_url(session, project_id, key):
     relative_path = urllib.parse.quote(key, safe='')
-    url_endpoint = f"/Documents/Study/{project_id}/Path/{relative_path}/Download"
+    url_endpoint = f"/Documents/Study/{project_id}/Path/{relative_path}/Url"
 
-    result = session.get_stream(url_endpoint)
+    result = session.get(url_endpoint)
+    return simplify_response(result)
+
+def download_file_from_url(url):
+    result = requests.get(url, stream=True)
+    result.raise_for_status()
     return result
 
 
