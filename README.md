@@ -68,6 +68,27 @@ Example usage from the terminal
 ```
 ​python3 -m phasezero.cli -u user@email.com -p yourPhaseZeroPassword download 1 cloud_directory/ -o my_local_computer
 ```
+
+### Deleting files from the terminal
+
+Use the `phasezero.cli` module's `delete` command to delete files from Phase Zero.
+
+The `delete` command takes the following positional arguments:
+
+```
+positional arguments:
+  project_id    Project Id
+  relative_path Relative path of the file to delete
+```
+
+Example usage from the terminal:
+
+```
+python3 -m phasezero.cli -u user@email.com -p yourPhaseZeroPassword delete 1 /path/to/file.txt
+```
+
+This will delete the file located at `/path/to/file.txt` in the project with ID 1.
+
 ## Recommendations
 
 If you do not want to run the command in the root of your folder, it is recommended to set add the phaszero module to your  `PYTHONPATH`
@@ -87,3 +108,4 @@ Here is a recommended alias that can be used to easily access the CLI:
 ```aidl
 alias pz_cli="source ~/Documents/pz/python3-venv/pz-python/bin/activate; python3 -m phasezero.cli"
 ```
+

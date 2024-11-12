@@ -5,6 +5,9 @@ import phasezero.upload as upload
 import phasezero.download as download
 import phasezero.contents as contents
 import phasezero.prompts as prompts
+import phasezero.delete as delete
+import phasezero.core as core
+import urllib.parse
 
 
 def main():
@@ -39,6 +42,12 @@ def main():
 
     parser_ls.set_defaults(func=contents.list_contents_main)
 
+    # DELETE
+    parser_delete = subparsers.add_parser('delete', description='Delete a file from Phase Zero')
+    parser_delete.add_argument('project_id', help='Project Id')
+    parser_delete.add_argument('relative_path', help='Relative path of the file to delete')
+    parser_delete.set_defaults(func=delete.delete_file_main)
+
     args = parser.parse_args()
 
     if args.user is None:
@@ -62,7 +71,7 @@ def main():
 
 def prompt_user(args):
     print("No subcommands were provided. Either provide a subcommand or continue")
-    print("Available subcommands\n1:Upload\n2:Download\n3:List Project or Files")
+    print("Available subcommands\n1:Upload\n2:Download\n3:List Project or Files\n4:Delete File")
     value = int(input("Please enter a subcommand (e.g. enter 1 for Upload):"))
     if value == 1:
         print("\n==========Upload Selected==========\n")
@@ -76,9 +85,16 @@ def prompt_user(args):
         print("\n==========List Selected==========\n")
         prompts.handle_list_prompt(args)
         contents.list_contents_main(args)
+    elif value == 4:
+        print("\n==========Delete Selected==========\n")
+        prompts.handle_delete_prompt(args)
+        delete.delete_file_main(args)
     else:
         print("Unknown command")
         return
+
+
+
 
 
 if __name__ == "__main__":
