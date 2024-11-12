@@ -33,3 +33,11 @@ def handle_download_prompt(args):
     else:
         args.path = ''
     args.output = input("Output Directory: ")
+
+
+def handle_delete_prompt(args):
+    print("Enter a Project Id\n")
+    args.project_id = input("Project Id: ")
+    print("Enter the relative path of the file to delete\n"
+          "Example: /path/to/file.txt\n")
+    args.relative_path = input("Relative Path: ")

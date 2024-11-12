@@ -27,6 +27,7 @@ def _create_contents(session, project_id, project_path, name):
     url_endpoint = f"/Documents/Study/{project_id}/Path/{relative_path}"
 
     result = session.post(url_endpoint)
+    
     return simplify_response(result)
 
 
@@ -84,4 +85,18 @@ def initiate_multipart_upload(session, document_id):
     url_endpoint = f"/Documents/{document_id}/MultipartUpload"
 
     result = session.post(url_endpoint)
+    return simplify_response(result)
+
+
+def delete_file(session, project_id, relative_path):
+    """
+    Delete a file from Phase Zero
+
+    :param session: phasezero.session.Session
+    :param project_id: Project or Study ID
+    :param relative_path: Relative path of the file to delete
+    :return: Response from the server
+    """
+    url_endpoint = f"/Documents/Study/{project_id}/Path/{urllib.parse.quote(relative_path, safe='')}/Delete"
+    result = session.delete(url_endpoint)
     return simplify_response(result)
