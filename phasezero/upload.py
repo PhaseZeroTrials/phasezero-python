@@ -47,25 +47,27 @@ def upload_folder(session, project_id, project_path, directory_path, failed_file
     :param failed_files: list of files failed to be uploaded
     :param progress: if not None, wrap in a progress (i.e. tqdm). Default: tqdm
     """
+    directory_path = os.path.abspath(directory_path)  # ensure full path
 
     for root, dirs, files in os.walk(directory_path):
-        root_name = os.path.basename(root)
-        if len(root_name) == 0:
-            root_name = os.path.basename(os.path.dirname(root))
+        # Get relative path from the root of the directory being uploaded
+        relative_root = os.path.relpath(root, start=directory_path)
+        relative_path = os.path.join(project_path, relative_root).replace("\\", "/")
 
-        relative_path = f"{project_path}/{root_name}"
         for f in files:
-            path = os.path.join(root, f)
+            local_file_path = os.path.join(root, f)
             try:
                 file = core.create_file(session, project_id, relative_path, f)
             except:
-                document = core.get_file(session, project_id, project_path, f)
+                document = core.get_file(session, project_id, relative_path, f)
                 file = core.initiate_multipart_upload(session, document['id'])
 
             try:
-                upload_revision(session, file, path, progress=progress)
-            except:
-                failed_files << relative_path
+                upload_revision(session, file, local_file_path, progress=progress)
+            except Exception as e:
+                print(f"Failed to upload {local_file_path}: {e}")
+                failed_files.append(local_file_path)
+
 
 
 
