@@ -1,4 +1,5 @@
 import collections
+import random
 import time
 import six
 import requests
@@ -219,8 +220,10 @@ class Session(object):
             except (TypeError, ValueError):
                 retry_after = 60
             retry_after = max(1, min(retry_after, 300))
-            print(f"Rate limited. Waiting {retry_after}s before retry…")
-            time.sleep(retry_after)
+            jitter = random.uniform(0, retry_after * 0.25)
+            wait = retry_after + jitter
+            print(f"Rate limited. Waiting {wait:.1f}s before retry…")
+            time.sleep(wait)
             r = method(url, verify=False, **kwargs)
         r.raise_for_status()
         return r
