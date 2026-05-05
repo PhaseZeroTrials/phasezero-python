@@ -166,9 +166,7 @@ class Session(object):
         return simplify_response(r.json())
 
     def _get(self, path, **kwargs):
-        r = self.session.get(self.make_url(path), verify=False, **kwargs)
-        r.raise_for_status()
-        return r
+        return self._do_request(self.session.get, path, **kwargs)
 
     def put(self, path, data=None, **kwargs):
         """
@@ -188,9 +186,7 @@ class Session(object):
         return simplify_response(r.json())
 
     def _put(self, path, **kwargs):
-        r = self.session.put(self.make_url(path), verify=False, **kwargs)
-        r.raise_for_status()
-        return r
+        return self._do_request(self.session.put, path, **kwargs)
 
     def post(self, path, data=None, **kwargs):
         if data is None:
@@ -202,15 +198,20 @@ class Session(object):
         return simplify_response(r.json())
 
     def _post(self, path, **kwargs):
-        r = self.session.post(self.make_url(path), verify=False, **kwargs)
-        r.raise_for_status()
-        return r
+        return self._do_request(self.session.post, path, **kwargs)
 
     def delete(self, path, **kwargs):
         return self.retry_call(self._delete, path, **kwargs)
 
     def _delete(self, path, **kwargs):
-        r = self.session.delete(self.make_url(path), verify=False, **kwargs)
+        return self._do_request(self.session.delete, path, **kwargs)
+
+    def _do_request(self, method, path, **kwargs):
+        url = self.make_url(path)
+        r = method(url, verify=False, **kwargs)
+        if r.status_code == 401:
+            self.refresh_token()
+            r = method(url, verify=False, **kwargs)
         r.raise_for_status()
         return r
 
