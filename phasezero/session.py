@@ -1,4 +1,5 @@
 import collections
+import time
 import six
 import requests
 import retrying
@@ -211,6 +212,15 @@ class Session(object):
         r = method(url, verify=False, **kwargs)
         if r.status_code == 401:
             self.refresh_token()
+            r = method(url, verify=False, **kwargs)
+        elif r.status_code == 429:
+            try:
+                retry_after = int(r.headers.get('Retry-After', '60'))
+            except (TypeError, ValueError):
+                retry_after = 60
+            retry_after = max(1, min(retry_after, 300))
+            print(f"Rate limited. Waiting {retry_after}s before retry…")
+            time.sleep(retry_after)
             r = method(url, verify=False, **kwargs)
         r.raise_for_status()
         return r
