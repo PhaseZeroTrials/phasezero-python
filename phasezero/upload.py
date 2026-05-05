@@ -149,9 +149,6 @@ def multipart_upload_to_aws(session, document, content_type, local_path, progres
     params = {'uploadId': document['uploadId']}
     encoded_params = urllib.parse.urlencode(params)
 
-    # Mark upload as complete
-    # Refresh in case of time out
-    session.refresh_token()
     session.put(f"{mark_as_complete_endpoint}?{encoded_params}", parts)
 
 
