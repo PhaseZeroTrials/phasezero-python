@@ -146,20 +146,17 @@ def multipart_upload_to_aws(session, document, content_type, local_path, progres
     create_presigned_url_endpoint = f"/Documents/{document['id']}/UploadUrl"
     mark_as_complete_endpoint = f"/Documents/{document['id']}/Revision"
 
-    urls = []
-    for part in range(1, num_chunks + 1):
-        params = {'uploadId': document['uploadId'], 'partNumber': part}
-        encoded_params = urllib.parse.urlencode(params)
-        signed_url = session.get(f"{create_presigned_url_endpoint}?{encoded_params}")
-        urls.append(signed_url)
-
     parts = []
     with target_file.open('rb') as fin:
-        for num, url in enumerate(progress(urls)):
-            part = num + 1
+        for part in progress(range(1, num_chunks + 1)):
             file_data = fin.read(max_size)
+
+            params = {'uploadId': document['uploadId'], 'partNumber': part}
+            encoded_params = urllib.parse.urlencode(params)
+            signed_url = session.get(f"{create_presigned_url_endpoint}?{encoded_params}")
+
             print(f"upload {document['name']} part {part} size={len(file_data)}")
-            res = requests.put(url, data=file_data, verify=False)
+            res = requests.put(signed_url, data=file_data, verify=False)
             print(res)
             if res.status_code != 200:
                 return
