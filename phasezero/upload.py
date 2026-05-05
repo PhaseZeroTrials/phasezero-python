@@ -36,7 +36,20 @@ class ProgressPercentage(object):
                 self._progress.close()
 
 
-def upload_folder(session, project_id, project_path, directory_path, failed_files, progress=tqdm):
+def _already_uploaded(session, project_id, project_path, name):
+    """
+    Returns True if a document at this project path already has a completed
+    revision on the server. Used to skip files when resuming a partial upload.
+    """
+    try:
+        existing = core.get_file(session, project_id, project_path, name)
+    except Exception:
+        return False
+    return bool(existing) and bool(existing.get('currentVersion'))
+
+
+def upload_folder(session, project_id, project_path, directory_path, failed_files,
+                  progress=tqdm, skip_existing=True):
     """
     Recursively uploads a folder to Phase Zero
 
@@ -46,6 +59,8 @@ def upload_folder(session, project_id, project_path, directory_path, failed_file
     :param directory_path: local path to directory
     :param failed_files: list of files failed to be uploaded
     :param progress: if not None, wrap in a progress (i.e. tqdm). Default: tqdm
+    :param skip_existing: if True (default), files that already have a completed
+        revision on the server are skipped. Lets you resume a partial upload.
     """
     directory_path = os.path.abspath(directory_path)  # ensure full path
 
@@ -56,6 +71,11 @@ def upload_folder(session, project_id, project_path, directory_path, failed_file
 
         for f in files:
             local_file_path = os.path.join(root, f)
+
+            if skip_existing and _already_uploaded(session, project_id, relative_path, f):
+                print(f"Skipping {local_file_path} (already uploaded)")
+                continue
+
             try:
                 file = core.create_file(session, project_id, relative_path, f)
             except:
