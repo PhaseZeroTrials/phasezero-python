@@ -43,9 +43,13 @@ def main():
     parser_ls.set_defaults(func=contents.list_contents_main)
 
     # DELETE
-    parser_delete = subparsers.add_parser('delete', description='Delete a file from Phase Zero')
+    parser_delete = subparsers.add_parser('delete', description='Delete a file or folder from Phase Zero')
     parser_delete.add_argument('project_id', help='Project Id')
-    parser_delete.add_argument('relative_path', help='Relative path of the file to delete')
+    parser_delete.add_argument('relative_path', help='Relative path of the file or folder to delete')
+    parser_delete.add_argument('-r', '--recursive', action='store_true',
+                               help='Recursively delete all files under the given folder path')
+    parser_delete.add_argument('-y', '--yes', action='store_true',
+                               help='Skip confirmation prompt when used with --recursive')
     parser_delete.set_defaults(func=delete.delete_file_main)
 
     args = parser.parse_args()

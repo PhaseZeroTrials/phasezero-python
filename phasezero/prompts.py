@@ -38,6 +38,10 @@ def handle_download_prompt(args):
 def handle_delete_prompt(args):
     print("Enter a Project Id\n")
     args.project_id = input("Project Id: ")
-    print("Enter the relative path of the file to delete\n"
-          "Example: /path/to/file.txt\n")
+    print("Enter the relative path of the file or folder to delete\n"
+          "Example for a file: /path/to/file.txt\n"
+          "Example for a folder: /path/to/folder\n")
     args.relative_path = input("Relative Path: ")
+    recursive_input = input("Recursively delete all files under this path? (y/N): ").strip().lower()
+    args.recursive = recursive_input in ('y', 'yes')
+    args.yes = False
